@@ -3,29 +3,38 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import { ButtonToolbar, Dropdown, DropdownButton } from 'react-bootstrap';
 
+// box class
 class Box extends React.Component {
+	// select function to determine if box will be on or off
 	selectBox = () => {
 		this.props.selectBox(this.props.row, this.props.col);
 	}
 
 	render() {
 		return (
-			<div className={this.props.boxClass} id={this.props.id} onClick={this.selectBox} />
+			<div className={this.props.boxClass} id={this.props.boxId} row={this.props.row} col={this.props.col} onClick={this.selectBox} />
 		);
 	}
+
 }
 
 class Grid extends React.Component {
 	render() {
+		// set the width of the wrapper
 		const width = (this.props.cols * 14);
+		// empty arr for box data
 		var rowsArr = [];
 
+		// empty box
 		var boxClass = " ";
 
 		for (var i = 0; i < this.props.rows; i++) {
 			for (var j = 0; j < this.props.cols; j++) {
+				// set boxId
 				let boxId = i + "_" + j;
+				// set boxClass
 				boxClass = this.props.gridFull[i][j] ? "box on" : "box off";
+				// push item to rowsArr
 				rowsArr.push(
 					<Box boxClass={boxClass} key={boxId} boxId={boxId} row={i} col={j} selectBox={this.props.selectBox} />
 				);
@@ -33,19 +42,19 @@ class Grid extends React.Component {
 		}
 
 		return (
-			// add box array to display content
+			// display the grid
 			<div className="grid" style={{width: width}}> {rowsArr} </div>
 		);
 	}
 }
 
 class Buttons extends React.Component {
-
+	// update grid size based on user
 	handleSelect = (evt) => {
 		this.props.gridSize(evt);
 	}
 
-
+	// display buttons and dropdown using react-bootstrap
 	render() {
 		return(
 			<div className="center">
@@ -94,7 +103,7 @@ class Main extends React.Component {
 		// colums
 		this.cols = 50;
 
-
+		// set the state of Main Component
 		this.state = {
 			generation: 0,
 			gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill(false))
@@ -102,47 +111,59 @@ class Main extends React.Component {
 	}
 
 	selectBox = (row, col) => {
+		// make a copy of the grid
 		let gridCopy = arrayClone(this.state.gridFull);
+		// set gridCopy[row][col] to value of !gridCopy[row][col];
 		gridCopy[row][col] = !gridCopy[row][col];
+		// update the state of gridFull
 		this.setState({
 			gridFull: gridCopy
 		});
 	}
 
+
 	seed = () => {
-		console.log("seed")
+		// store the cloned copy
 		let gridCopy = arrayClone(this.state.gridFull);
 		for (var i = 0; i < this.rows; i++) {
 			for (var j = 0; j < this.cols; j++) {
+				// each box has a 1/4 chance of being seeding
 				if(Math.floor(Math.random() * 4) === 1) {
+					// if true updatde box value to true
 					gridCopy[i][j] = true;
 				}
 			}
 		}
+		// update the state of the grid
 		this.setState({
 			gridFull: gridCopy
 		});
 	}
 
+	// play the game
 	playButton = () => {
 		clearInterval(this.intervalId);
 		this.intervalId = setInterval(this.play, this.speed);
 	}
 
+	// pause the game
 	pauseButton = () => {
 		clearInterval(this.intervalId);
 	}
 
+	// slow down the speed prop
 	slow = () => {
 		this.speed = 1000;
 		this.playButton();
 	}
 
+	// increase the speed prop
 	fast = () => {
 		this.speed = 100;
 		this.playButton();
 	}
 
+	// clear the board
 	clear = () => {
 		var grid = Array(this.rows).fill().map(() => Array(this.cols).fill(false));
 		this.setState({
@@ -151,6 +172,7 @@ class Main extends React.Component {
 		});
 	}
 
+	// modifiy grid size based on what the user selects 
 	gridSize = (size) => {
 		switch (size) {
 			case "1": 
@@ -169,9 +191,15 @@ class Main extends React.Component {
 	}
 
 	play = () => {
+		// create 2 copies of the grid so the 2nd can be modified based on the first
 		let g = this.state.gridFull;
 		let g2 = arrayClone(this.state.gridFull);
 
+		// logic for game rules:
+		// 1. Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+		// 2. Any live cell with two or three live neighbours lives on to the next generation.
+		// 3. Any live cell with more than three live neighbours dies, as if by overpopulation.
+		// 4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 		for (let i = 0; i < this.rows; i++) {
 		  for (let j = 0; j < this.cols; j++) {
 		    let count = 0;
@@ -187,6 +215,7 @@ class Main extends React.Component {
 		    if (!g[i][j] && count === 3) g2[i][j] = true;
 		  }
 		}
+		// update state data
 		this.setState({
 		  gridFull: g2,
 		  generation: this.state.generation + 1
@@ -194,10 +223,9 @@ class Main extends React.Component {
 
 	}
 
-
+	// seed the board on start
 	componentDidMount() {
 		this.seed();
-		// this.playButton();
 	}
 
 	render() {
@@ -212,6 +240,7 @@ class Main extends React.Component {
 	}
 }
 
+// clone an array
 function arrayClone(arr) {
 	return JSON.parse(JSON.stringify(arr));
 }
