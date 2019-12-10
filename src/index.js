@@ -94,6 +94,20 @@ class Buttons extends React.Component {
 }
 
 class Main extends React.Component {
+	// 1: CONSTRUCTOR
+	// 2: SELECT BOX
+	// 3: SEED
+	// 4: PLAY BUTTON
+	// 5: PAUSE BUTTON
+	// 6: SLOW DOWN THE GAME
+	// 7: SPEED UP THE GAME
+	// 8: CLEAR THE BOARD
+	// 9: ADJUST THE GRID SIZE
+	// 10:PLAY THE GAME
+	// 11: COMPONENT MOUNTED
+	// 12: RENDER
+
+	// 1: CONSTRUCTOR
 	constructor() {
 		super();
 		// game speed
@@ -109,7 +123,7 @@ class Main extends React.Component {
 			gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill(false))
 		}
 	}
-
+	// 2: SELECT BOX
 	selectBox = (row, col) => {
 		// make a copy of the grid
 		let gridCopy = arrayClone(this.state.gridFull);
@@ -121,7 +135,7 @@ class Main extends React.Component {
 		});
 	}
 
-
+	// 3: SEED
 	seed = () => {
 		// store the cloned copy
 		let gridCopy = arrayClone(this.state.gridFull);
@@ -140,40 +154,43 @@ class Main extends React.Component {
 		});
 	}
 
-	// play the game
+	// 4: PLAY BUTTON
 	playButton = () => {
 		clearInterval(this.intervalId);
 		this.intervalId = setInterval(this.play, this.speed);
 	}
 
-	// pause the game
+	// 5: PAUSE BUTTON
 	pauseButton = () => {
 		clearInterval(this.intervalId);
 	}
 
-	// slow down the speed prop
+	// 6: SLOW DOWN THE GAME
 	slow = () => {
 		this.speed = 1000;
 		this.playButton();
 	}
 
-	// increase the speed prop
+	
 	fast = () => {
 		this.speed = 100;
 		this.playButton();
 	}
 
-	// clear the board
+	// 8: CLEAR THE BOARD
 	clear = () => {
+		// update each box to be "box off"
 		var grid = Array(this.rows).fill().map(() => Array(this.cols).fill(false));
+		// update the state
 		this.setState({
 			gridFull: grid,
 			generation: 0
 		});
 	}
-
-	// modifiy grid size based on what the user selects 
+	
+	// 9: ADJUST THE GRID SIZE
 	gridSize = (size) => {
+		// modifiy grid size based on what the user selects 
 		switch (size) {
 			case "1": 
 				this.cols = 20;
@@ -189,7 +206,8 @@ class Main extends React.Component {
 		}
 		this.clear();
 	}
-
+	
+	// 10:PLAY THE GAME
 	play = () => {
 		// create 2 copies of the grid so the 2nd can be modified based on the first
 		let g = this.state.gridFull;
@@ -223,11 +241,13 @@ class Main extends React.Component {
 
 	}
 
-	// seed the board on start
+	// 11: COMPONENT MOUNTED
 	componentDidMount() {
+		// seed the board on start
 		this.seed();
 	}
 
+	// 12: RENDER
 	render() {
 		return (
 			<div>
